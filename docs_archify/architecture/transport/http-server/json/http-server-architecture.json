@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": { "title": "HTTP 服务端结构与请求链图", "quality_profile": "showcase", "locale": "zh-CN", "viewBox": [1100, 720] },
+  "components": [
+    { "id": "app", "type": "frontend", "label": "App 生命周期", "pos": [60, 80], "size": [160, 60], "tag": "Start/Stop" },
+    { "id": "server", "type": "security", "label": "http.Server 包装", "pos": [380, 70], "size": [190, 80], "tag": "内嵌 *http.Server" },
+    { "id": "filter", "type": "backend", "label": "请求 filter", "pos": [760, 40], "size": [180, 56], "tag": "超时+挂 Transporter" },
+    { "id": "mux", "type": "database", "label": "mux 路由/Router", "pos": [760, 150], "size": [180, 64], "tag": "匹配+Group" },
+    { "id": "matcher", "type": "cloud", "label": "middleware matcher", "pos": [380, 330], "size": [190, 70], "tag": "按 operation" },
+    { "id": "biz", "type": "backend", "label": "业务 handler", "pos": [760, 330], "size": [180, 60], "tag": "wrapper.Context" },
+    { "id": "stdlib", "type": "external", "label": "net/http + mux", "pos": [60, 330], "size": [160, 60], "tag": "不在本仓库" }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "transport/http 服务端", "wraps": ["server", "filter", "mux"] }
+  ],
+  "connections": [
+    { "id": "c1", "from": "app", "to": "server", "label": "Start/Stop", "variant": "emphasis" },
+    { "id": "c2", "from": "server", "to": "filter", "label": "Use", "variant": "default" },
+    { "id": "c3", "from": "filter", "to": "mux", "label": "next.ServeHTTP", "variant": "default", "labelDy": 26 },
+    { "id": "c4", "from": "mux", "to": "biz", "label": "handler", "variant": "emphasis", "labelDy": 26 },
+    { "id": "c5", "from": "biz", "to": "matcher", "label": "Middleware()", "variant": "dashed", "labelDy": 28 },
+    { "id": "c6", "from": "server", "to": "stdlib", "label": "Serve", "variant": "dashed" }
+  ],
+  "cards": [
+    { "dot": "emerald", "title": "设计要点", "items": [
+      "filter 注入超时并把 Transport 挂入请求 ctx",
+      "wrapper.Reset 复用对象，避免每请求分配",
+      "默认 1s 超时，错误经 ErrorEncoder 输出"
+    ] }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": { "title": "App 应用生命周期管理器架构图", "quality_profile": "showcase", "locale": "zh-CN" },
+  "components": [
+    { "id": "user", "type": "external", "label": "业务 main", "pos": [40, 300], "size": [130, 60] },
+    { "id": "app", "type": "backend", "label": "App 生命周期管理器", "pos": [280, 290], "size": [170, 80], "tag": "package kratos" },
+    { "id": "server", "type": "backend", "label": "transport.Server 集合", "pos": [560, 180], "size": [160, 60] },
+    { "id": "registrar", "type": "external", "label": "registry.Registrar", "pos": [560, 320], "size": [160, 60], "tag": "注册中心" },
+    { "id": "signal", "type": "external", "label": "操作系统信号", "pos": [560, 460], "size": [160, 60] },
+    { "id": "ctx", "type": "security", "label": "context 取消链", "pos": [280, 470], "size": [170, 60] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "本仓库源码（package kratos 根包）", "wraps": ["app", "ctx"] }
+  ],
+  "connections": [
+    { "id": "c1", "from": "user", "to": "app", "label": "New(opts...).Run()", "variant": "emphasis" },
+    { "id": "c2", "from": "app", "to": "server", "label": "Start / Stop", "variant": "emphasis" },
+    { "id": "c3", "from": "app", "to": "registrar", "label": "Register / Deregister", "variant": "default" },
+    { "id": "c4", "from": "signal", "to": "app", "label": "SIGTERM/SIGINT/SIGQUIT", "variant": "dashed" }
+  ],
+  "cards": [
+    { "dot": "emerald", "title": "核心机制", "items": [
+      "errgroup 并行拉起各 Server，wg.Wait 确保 Start 已发起再注册",
+      "信号触发 Stop：先 Deregister 再 cancel，优雅停止用 context.WithoutCancel",
+      "Registrar.Register/Deregister 各自带 10s 超时"
+    ]}
+  ]
+}

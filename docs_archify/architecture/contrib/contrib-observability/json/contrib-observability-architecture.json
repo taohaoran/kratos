@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "contrib-observability 架构图",
+    "quality_profile": "standard",
+    "locale": "zh-CN"
+  },
+  "components": [
+    {
+      "id": "core",
+      "type": "backend",
+      "label": "kratos 核心\nmiddleware/transport/log",
+      "pos": [
+        40,
+        200
+      ],
+      "size": [
+        260,
+        70
+      ]
+    },
+    {
+      "id": "otel",
+      "type": "external",
+      "label": "contrib/otel\nlog/metrics/tracing",
+      "pos": [
+        360,
+        100
+      ],
+      "size": [
+        220,
+        70
+      ]
+    },
+    {
+      "id": "sentry",
+      "type": "external",
+      "label": "contrib/errortracker\nsentry",
+      "pos": [
+        360,
+        240
+      ],
+      "size": [
+        220,
+        60
+      ]
+    },
+    {
+      "id": "opensergo",
+      "type": "external",
+      "label": "contrib/opensergo\n配置中心对接",
+      "pos": [
+        360,
+        360
+      ],
+      "size": [
+        220,
+        60
+      ]
+    },
+    {
+      "id": "otlpsvc",
+      "type": "external",
+      "label": "OTLP/Sentry\n后端服务",
+      "pos": [
+        660,
+        200
+      ],
+      "size": [
+        180,
+        60
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "c1",
+      "from": "otel",
+      "to": "core",
+      "variant": "default"
+    },
+    {
+      "id": "c2",
+      "from": "sentry",
+      "to": "core",
+      "variant": "default"
+    },
+    {
+      "id": "c3",
+      "from": "opensergo",
+      "to": "core",
+      "variant": "default"
+    },
+    {
+      "id": "c4",
+      "from": "otel",
+      "to": "otlpsvc",
+      "variant": "emphasis"
+    },
+    {
+      "id": "c5",
+      "from": "sentry",
+      "to": "otlpsvc",
+      "variant": "emphasis"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "核心要点",
+      "items": [
+        "otel/log 是 slog.Handler 桥，复用 v3 日志装饰器",
+        "tracing/metrics 是 transport 中间件",
+        "sentry/opensergo 各为独立适配"
+      ]
+    }
+  ]
+}

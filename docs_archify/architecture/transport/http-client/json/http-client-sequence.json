@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": { "title": "HTTP Invoke 调用时序", "quality_profile": "showcase", "locale": "zh-CN", "viewBox": [1080, 720] },
+  "participants": [
+    { "id": "biz", "type": "frontend", "label": "client stub" },
+    { "id": "client", "type": "backend", "label": "http.Client" },
+    { "id": "mw", "type": "cloud", "label": "中间件链" },
+    { "id": "selector", "type": "database", "label": "selector" },
+    { "id": "server", "type": "external", "label": "HTTP 服务端" }
+  ],
+  "messages": [
+    { "id": "m1", "from": "biz", "to": "client", "y": 160, "label": "Invoke(method,path,args)", "variant": "emphasis" },
+    { "id": "m2", "from": "client", "to": "mw", "y": 220, "label": "编码请求体并 Chain 中间件", "variant": "default" },
+    { "id": "m3", "from": "mw", "to": "selector", "y": 280, "label": "Select 选节点", "variant": "default" },
+    { "id": "m4", "from": "selector", "to": "server", "y": 340, "label": "改写 Host 后 cc.Do", "variant": "default" },
+    { "id": "m5", "from": "server", "to": "selector", "y": 400, "label": "响应", "variant": "return" },
+    { "id": "m6", "from": "selector", "to": "mw", "y": 460, "label": "done 回调 + decoder", "variant": "return" },
+    { "id": "m7", "from": "mw", "to": "client", "y": 520, "label": "reply/err", "variant": "return" },
+    { "id": "m8", "from": "client", "to": "biz", "y": 580, "label": "返回", "variant": "return" }
+  ]
+}

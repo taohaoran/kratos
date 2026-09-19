@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": { "title": "BBR 限流决策数据流", "quality_profile": "showcase", "locale": "zh-CN" },
+  "stages": [ { "label": "CPU 采样" }, { "label": "统计窗口" }, { "label": "决策" }, { "label": "执行" } ],
+  "nodes": [
+    { "id": "cpu", "type": "backend", "label": "cpuSampler+EMA", "stage": 0, "row": 0 },
+    { "id": "pass", "type": "database", "label": "passStat", "stage": 1, "row": 0 },
+    { "id": "rt", "type": "database", "label": "rtStat", "stage": 1, "row": 1 },
+    { "id": "decide", "type": "backend", "label": "shouldDrop", "stage": 2, "row": 0 },
+    { "id": "allow", "type": "frontend", "label": "放行 inFlight++", "stage": 3, "row": 0 },
+    { "id": "reject", "type": "security", "label": "拒绝", "stage": 3, "row": 1 }
+  ],
+  "flows": [
+    { "from": "cpu", "to": "decide", "label": "gCPU", "variant": "emphasis", "route": "bottom-channel" },
+    { "from": "pass", "to": "decide", "label": "maxPASS", "variant": "default", "route": "straight" },
+    { "from": "rt", "to": "decide", "label": "minRT", "variant": "default", "route": "straight" },
+    { "from": "decide", "to": "allow", "label": "放行", "variant": "emphasis", "route": "straight", "labelDy": -20 },
+    { "from": "decide", "to": "reject", "label": "拒绝", "variant": "security", "route": "straight", "labelDy": 20 }
+  ]
+}

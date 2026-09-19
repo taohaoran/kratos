@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": { "title": "Kratos v3 系统分层架构图", "quality_profile": "showcase", "locale": "zh-CN", "viewBox": [1180, 620] },
+  "components": [
+    { "id": "caller", "type": "external", "label": "调用方", "pos": [60, 280], "size": [140, 64] },
+    { "id": "transport", "type": "backend", "label": "transport 传输层", "pos": [300, 280], "size": [190, 64], "tag": "接入层" },
+    { "id": "middleware", "type": "backend", "label": "middleware 中间件链", "pos": [560, 280], "size": [190, 64], "tag": "横切" },
+    { "id": "service", "type": "frontend", "label": "业务 Service", "pos": [830, 280], "size": [170, 64], "tag": "业务层" },
+    { "id": "framework", "type": "backend", "label": "框架基础库", "pos": [830, 460], "size": [170, 64], "tag": "基础库" },
+    { "id": "discovery", "type": "database", "label": "selector + registry", "pos": [300, 460], "size": [190, 64], "tag": "治理" },
+    { "id": "contrib", "type": "cloud", "label": "contrib 生态", "pos": [60, 460], "size": [140, 64], "tag": "可选集成" }
+  ],
+  "connections": [
+    { "id": "c1", "from": "caller", "to": "transport", "label": "请求", "variant": "emphasis" },
+    { "id": "c2", "from": "transport", "to": "middleware", "label": "进入链", "variant": "default" },
+    { "id": "c3", "from": "middleware", "to": "service", "label": "调用业务", "variant": "emphasis" },
+    { "id": "c4", "from": "service", "to": "framework", "label": "基础能力", "variant": "default", "labelDy": 26 },
+    { "id": "c5", "from": "transport", "to": "discovery", "label": "注册与寻址", "variant": "default", "labelDy": 26 },
+    { "id": "c6", "from": "contrib", "to": "discovery", "label": "适配实现", "variant": "dashed" }
+  ],
+  "cards": [
+    { "dot": "emerald", "title": "分层要点", "items": ["传输层与业务解耦，统一 Server/Transporter 抽象", "中间件可任意组合，横切逻辑不侵入业务", "registry/encoding/config 全部接口化"] },
+    { "dot": "cyan", "title": "系统边界", "items": ["框架只提供小而显式的 API", "具体注册中心/配置中心/可观测后端不在本仓库源码内"] }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": { "title": "metadata-propagation 架构图", "quality_profile": "standard", "locale": "zh-CN" },
+  "components": [
+    { "id": "server", "type": "backend", "label": "serverMetadataKey\n服务端上下文", "pos": [300, 80], "size": [200, 60] },
+    { "id": "md", "type": "backend", "label": "Metadata\nmap[string][]string", "pos": [300, 200], "size": [200, 70], "tag": "key 小写" },
+    { "id": "client", "type": "backend", "label": "clientMetadataKey\n客户端上下文", "pos": [300, 330], "size": [200, 60] },
+    { "id": "transport", "type": "external", "label": "transport header\ngrpc/http", "pos": [600, 210], "size": [180, 60] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "metadata 包", "wraps": ["server", "md", "client"] }
+  ],
+  "connections": [
+    { "id": "c1", "from": "server", "to": "md", "label": "挂摘", "variant": "default", "labelDy": 20 },
+    { "id": "c2", "from": "client", "to": "md", "label": "挂摘", "variant": "default", "labelDy": -20 },
+    { "id": "c3", "from": "md", "to": "transport", "label": "中间件互转", "variant": "emphasis" }
+  ],
+  "cards": [
+    { "dot": "emerald", "title": "核心要点", "items": ["Metadata 是 map[string][]string，key 统一小写", "服务端/客户端各用独立 ctx key 区分", "中间件负责与 transport header 互转"] }
+  ]
+}

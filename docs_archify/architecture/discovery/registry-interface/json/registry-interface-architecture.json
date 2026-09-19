@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": { "title": "服务注册发现接口契约图", "quality_profile": "showcase", "locale": "zh-CN" },
+  "components": [
+    { "id": "app", "type": "external", "label": "服务端 App", "pos": [40, 160], "size": [150, 60] },
+    { "id": "client", "type": "external", "label": "客户端 resolver", "pos": [40, 420], "size": [160, 60] },
+    { "id": "reg", "type": "backend", "label": "Registrar", "pos": [380, 160], "size": [160, 60], "tag": "注册侧" },
+    { "id": "disc", "type": "backend", "label": "Discovery / Watcher", "pos": [380, 340], "size": [190, 60], "tag": "发现侧" },
+    { "id": "inst", "type": "database", "label": "ServiceInstance", "pos": [380, 480], "size": [160, 60] },
+    { "id": "etcd", "type": "cloud", "label": "etcd/consul/k8s", "pos": [720, 320], "size": [180, 70], "tag": "外部注册中心" }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "registry 包（接口契约）", "wraps": ["reg", "disc", "inst"] }
+  ],
+  "connections": [
+    { "id": "c1", "from": "app", "to": "reg", "label": "Register/Deregister", "variant": "emphasis" },
+    { "id": "c2", "from": "client", "to": "disc", "label": "GetService/Watch.Next", "variant": "emphasis" },
+    { "id": "c4", "from": "reg", "to": "etcd", "label": "实现侧", "variant": "dashed" },
+    { "id": "c5", "from": "disc", "to": "etcd", "label": "实现侧", "variant": "dashed" }
+  ],
+  "cards": [
+    { "dot": "emerald", "title": "契约要点", "items": [
+      "Registrar：服务端 Register/Deregister 两方法",
+      "Discovery：GetService 拉取 + Watch 监听变更",
+      "ServiceInstance：ID/Name/Version/Metadata/Endpoints"
+    ]}
+  ]
+}

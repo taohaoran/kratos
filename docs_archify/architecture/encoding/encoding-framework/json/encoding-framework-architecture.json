@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": { "title": "encoding-framework 架构图", "quality_profile": "standard", "locale": "zh-CN" },
+  "components": [
+    { "id": "iface", "type": "backend", "label": "Codec 接口\nencoding.go", "pos": [40, 200], "size": [160, 70], "tag": "Marshal/Unmarshal/Name" },
+    { "id": "reg", "type": "backend", "label": "全局注册表\nregisteredCodecs", "pos": [290, 200], "size": [180, 70], "tag": "map[string]Codec" },
+    { "id": "json", "type": "backend", "label": "json codec", "pos": [560, 80], "size": [140, 50] },
+    { "id": "proto", "type": "backend", "label": "proto codec", "pos": [560, 150], "size": [140, 50] },
+    { "id": "protojson", "type": "backend", "label": "protojson codec", "pos": [560, 220], "size": [140, 50] },
+    { "id": "xml", "type": "backend", "label": "xml codec", "pos": [560, 290], "size": [140, 50] },
+    { "id": "yaml", "type": "backend", "label": "yaml codec", "pos": [560, 360], "size": [140, 50] },
+    { "id": "form", "type": "backend", "label": "form codec", "pos": [560, 430], "size": [140, 50] },
+    { "id": "transport", "type": "external", "label": "transport/config 消费方", "pos": [290, 360], "size": [180, 60] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "encoding 注册表", "wraps": ["reg"] },
+    { "kind": "region", "label": "各 codec 包 init 自注册", "wraps": ["json", "proto", "protojson", "xml", "yaml", "form"] }
+  ],
+  "connections": [
+    { "id": "c1", "from": "json", "to": "reg", "label": "init 注册", "variant": "emphasis" },
+    { "id": "c2", "from": "proto", "to": "reg", "variant": "default" },
+    { "id": "c3", "from": "protojson", "to": "reg", "variant": "default" },
+    { "id": "c4", "from": "xml", "to": "reg", "variant": "default" },
+    { "id": "c5", "from": "yaml", "to": "reg", "variant": "default" },
+    { "id": "c6", "from": "form", "to": "reg", "variant": "default" },
+    { "id": "c7", "from": "reg", "to": "iface", "label": "实现接口", "variant": "default", "labelDy": 20 },
+    { "id": "c8", "from": "transport", "to": "reg", "label": "GetCodec(name)", "variant": "emphasis" }
+  ],
+  "cards": [
+    { "dot": "emerald", "title": "核心要点", "items": ["全局 map 注册表 + init 自注册模式", "消费方按 content-subtype 小写名取 codec", "新增格式只需新包 init 调 RegisterCodec"] }
+  ]
+}

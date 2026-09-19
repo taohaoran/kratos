@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": { "title": "服务发现 watch 数据流", "quality_profile": "showcase", "locale": "zh-CN" },
+  "stages": [
+    { "label": "监听" },
+    { "label": "解析" },
+    { "label": "过滤" },
+    { "label": "推送" }
+  ],
+  "nodes": [
+    { "id": "watch", "type": "backend", "label": "w.Next()", "stage": 0, "row": 0 },
+    { "id": "err", "type": "frontend", "label": "出错退避重试", "stage": 0, "row": 1 },
+    { "id": "parse", "type": "backend", "label": "ParseEndpoint", "stage": 1, "row": 0 },
+    { "id": "subset", "type": "database", "label": "subset 一致性哈希", "stage": 2, "row": 0 },
+    { "id": "update", "type": "messagebus", "label": "cc.UpdateState", "stage": 3, "row": 0 },
+    { "id": "picker", "type": "cloud", "label": "balancer picker", "stage": 3, "row": 1 }
+  ],
+  "flows": [
+    { "from": "watch", "to": "parse", "label": "实例列表", "variant": "emphasis", "route": "straight" },
+    { "from": "err", "to": "watch", "label": "1s 后重试", "variant": "dashed", "route": "vertical-channel" },
+    { "from": "parse", "to": "subset", "label": "grpc 端点", "variant": "default", "route": "straight" },
+    { "from": "subset", "to": "update", "label": "过滤后地址", "variant": "default", "route": "straight" },
+    { "from": "update", "to": "picker", "label": "新节点表", "variant": "emphasis", "route": "straight", "labelDy": 24 }
+  ]
+}

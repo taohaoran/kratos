@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "diagram_type": "lifecycle",
+  "meta": { "title": "SRE 熔断器两态迁移", "quality_profile": "showcase", "locale": "zh-CN", "viewBox": [800, 620] },
+  "lanes": [
+    { "id": "main", "label": "正常" },
+    { "id": "degraded", "label": "熔断" }
+  ],
+  "states": [
+    { "id": "closed", "type": "active", "label": "StateClosed", "sublabel": "统计健康则放行", "lane": "main", "col": 0 },
+    { "id": "open", "type": "failure", "label": "StateOpen", "sublabel": "按 dropRatio 概率拒绝", "lane": "degraded", "col": 0, "yOffset": 60 }
+  ],
+  "transitions": [
+    { "id": "t1", "from": "closed", "to": "open", "label": "失败率升高", "variant": "security" },
+    { "id": "t2", "from": "open", "to": "closed", "label": "成功率回升", "variant": "emphasis" }
+  ],
+  "cards": [
+    { "dot": "amber", "title": "实现说明", "items": [
+      "本实现只有 Open/Closed 两态，无显式半开",
+      "state 仅为 CAS 提示，决策每次按统计实时计算",
+      "恢复靠窗口内成功率回升 + 概率放行"
+    ]}
+  ]
+}

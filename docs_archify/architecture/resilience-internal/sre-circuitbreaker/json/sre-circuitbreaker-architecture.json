@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": { "title": "SRE 熔断器组件图", "quality_profile": "showcase", "locale": "zh-CN" },
+  "components": [
+    { "id": "mw", "type": "external", "label": "circuitbreaker middleware", "pos": [40, 300], "size": [180, 60] },
+    { "id": "breaker", "type": "backend", "label": "Breaker", "pos": [320, 290], "size": [150, 80], "tag": "internal/circuitbreaker" },
+    { "id": "stat", "type": "database", "label": "rollingCounter 滑动窗口", "pos": [600, 180], "size": [190, 60] },
+    { "id": "rnd", "type": "backend", "label": "加锁随机数源", "pos": [620, 330], "size": [150, 60] },
+    { "id": "bucket", "type": "database", "label": "N 个时间桶", "pos": [620, 460], "size": [150, 60] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "internal/circuitbreaker（仅框架内部）", "wraps": ["breaker", "stat", "rnd", "bucket"] }
+  ],
+  "connections": [
+    { "id": "c1", "from": "mw", "to": "breaker", "label": "调用", "variant": "emphasis" },
+    { "id": "c2", "from": "breaker", "to": "stat", "label": "summary/add", "variant": "default" },
+    { "id": "c3", "from": "breaker", "to": "rnd", "label": "random<dropRatio", "variant": "dashed" }
+  ],
+  "cards": [
+    { "dot": "emerald", "title": "SRE 算法要点", "items": [
+      "k = 1/(1-failureRatio)，默认 failureRatio=0.5 故 k=2",
+      "dropRatio = max(0,(total-k*successes)/(total+1)) 概率拒绝",
+      "总请求 < request(默认20) 时一律放行；窗口默认 3s / 10 桶"
+    ]}
+  ]
+}

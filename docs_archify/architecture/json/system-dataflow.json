@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": { "title": "一次请求经过 transport→middleware→业务 的数据流", "quality_profile": "showcase", "locale": "zh-CN" },
+  "stages": [
+    { "label": "接入层" },
+    { "label": "中间件层" },
+    { "label": "业务层" },
+    { "label": "基础能力" }
+  ],
+  "nodes": [
+    { "id": "n1", "type": "external", "label": "客户端请求", "stage": 0, "row": 0 },
+    { "id": "n2", "type": "backend", "label": "transport", "stage": 1, "row": 0, "width": 150 },
+    { "id": "n3", "type": "backend", "label": "中间件链", "stage": 2, "row": 0, "width": 150 },
+    { "id": "n4", "type": "frontend", "label": "业务 Handler", "stage": 3, "row": 0 },
+    { "id": "n5", "type": "backend", "label": "编码响应", "stage": 2, "row": 1, "width": 150 },
+    { "id": "n6", "type": "external", "label": "响应返回", "stage": 1, "row": 1, "width": 150 }
+  ],
+  "flows": [
+    { "from": "n1", "to": "n2", "label": "请求", "variant": "emphasis", "route": "straight" },
+    { "from": "n2", "to": "n3", "label": "ctx 透传", "variant": "default", "route": "straight" },
+    { "from": "n3", "to": "n4", "label": "RPC 调用", "variant": "emphasis", "route": "straight" },
+    { "from": "n4", "to": "n5", "label": "业务结果", "variant": "default", "route": "vertical-channel" },
+    { "from": "n5", "to": "n6", "label": "序列化", "variant": "default", "route": "straight" }
+  ]
+}

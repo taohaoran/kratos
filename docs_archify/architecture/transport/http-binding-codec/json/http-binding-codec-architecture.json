@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": { "title": "HTTP 编解码与绑定架构图", "quality_profile": "showcase", "locale": "zh-CN", "viewBox": [1100, 720] },
+  "components": [
+    { "id": "server", "type": "frontend", "label": "http.Server", "pos": [60, 80], "size": [150, 60], "tag": "持有编解码字段" },
+    { "id": "decode", "type": "security", "label": "请求解码", "pos": [360, 40], "size": [170, 56], "tag": "Vars/Query/Body" },
+    { "id": "encode", "type": "backend", "label": "响应/错误编码", "pos": [360, 140], "size": [170, 64], "tag": "Encoder/ErrorEncoder" },
+    { "id": "codec", "type": "database", "label": "encoding codec", "pos": [720, 90], "size": [160, 60], "tag": "json/proto/form" },
+    { "id": "filter", "type": "cloud", "label": "FilterChain", "pos": [60, 330], "size": [150, 60], "tag": "过滤器" },
+    { "id": "status", "type": "messagebus", "label": "status 码转换", "pos": [360, 330], "size": [170, 60], "tag": "HTTP↔gRPC" },
+    { "id": "stream", "type": "backend", "label": "SSE/WebSocket 流", "pos": [720, 330], "size": [160, 60], "tag": "stream.go" },
+    { "id": "pprof", "type": "external", "label": "pprof", "pos": [888, 40], "size": [150, 56], "tag": "/debug/pprof" }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "transport/http 绑定编解码", "wraps": ["decode", "encode", "filter", "status", "stream"] }
+  ],
+  "connections": [
+    { "id": "c1", "from": "server", "to": "decode", "label": "调用", "variant": "emphasis" },
+    { "id": "c2", "from": "server", "to": "encode", "label": "调用", "variant": "default" },
+    { "id": "c3", "from": "decode", "to": "codec", "label": "GetCodec", "variant": "default" },
+    { "id": "c4", "from": "encode", "to": "codec", "label": "Marshal", "variant": "default" },
+    { "id": "c5", "from": "encode", "to": "status", "label": "错误码", "variant": "dashed", "labelDy": 26 },
+    { "id": "c6", "from": "server", "to": "filter", "label": "FilterChain", "variant": "dashed", "labelDy": 26 },
+    { "id": "c7", "from": "server", "to": "stream", "label": "流", "variant": "dashed" }
+  ],
+  "cards": [
+    { "dot": "emerald", "title": "设计要点", "items": [
+      "CodecForRequest 按 Content-Type/Accept 选 codec，缺省 json",
+      "重定向错误用 errors.As 识别，优先级高于普通错误序列化",
+      "流式用 detachStreamContext 解耦请求与长连接 ctx"
+    ] }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": { "title": "subset/matcher/httputil/context 工具组件图", "quality_profile": "showcase", "locale": "zh-CN" },
+  "components": [
+    { "id": "resolver", "type": "external", "label": "transport resolver", "pos": [40, 140], "size": [180, 60] },
+    { "id": "server", "type": "external", "label": "transport http/grpc server", "pos": [40, 320], "size": [200, 60] },
+    { "id": "interceptor", "type": "external", "label": "grpc interceptor", "pos": [40, 500], "size": [180, 60] },
+    { "id": "sub", "type": "backend", "label": "subset 一致性哈希", "pos": [360, 140], "size": [170, 60] },
+    { "id": "match", "type": "backend", "label": "matcher 中间件匹配", "pos": [360, 320], "size": [170, 60] },
+    { "id": "http", "type": "backend", "label": "httputil content-type", "pos": [640, 200], "size": [170, 60] },
+    { "id": "ctx", "type": "backend", "label": "context.Merge", "pos": [360, 500], "size": [150, 60] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "internal/{subset,matcher,httputil,context}", "wraps": ["sub", "match", "http", "ctx"] }
+  ],
+  "connections": [
+    { "id": "c1", "from": "resolver", "to": "sub", "label": "Subset(key,ins,num)", "variant": "emphasis" },
+    { "id": "c2", "from": "server", "to": "match", "label": "Match(operation)", "variant": "default" },
+    { "id": "c3", "from": "server", "to": "http", "label": "ContentType", "variant": "default" },
+    { "id": "c4", "from": "interceptor", "to": "ctx", "label": "Merge(ctx1,ctx2)", "variant": "default" }
+  ],
+  "cards": [
+    { "dot": "emerald", "title": "四件套职责", "items": [
+      "subset：虚拟节点一致性哈希，为 key 选确定性子集",
+      "matcher：按 operation 精确/前缀匹配挂中间件",
+      "httputil：content-type 前缀与子类型解析",
+      "context.Merge：双父 ctx 合并，任一取消即结束"
+    ]}
+  ]
+}

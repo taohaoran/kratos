@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": { "title": "protoc 插件调用时序", "quality_profile": "standard", "locale": "zh-CN", "viewBox": [1080, 620], "column_fit": "spread" },
+  "participants": [
+    { "id": "protoc", "type": "external", "label": "protoc" },
+    { "id": "plugin", "type": "backend", "label": "插件" },
+    { "id": "protogen", "type": "backend", "label": "protogen" },
+    { "id": "tmpl", "type": "backend", "label": "模板" }
+  ],
+  "messages": [
+    { "id": "m1", "from": "protoc", "to": "plugin", "y": 160, "label": "stdin: 请求", "variant": "emphasis" },
+    { "id": "m2", "from": "plugin", "to": "protogen", "y": 220, "label": "Options.Run 解析", "variant": "default" },
+    { "id": "m3", "from": "protogen", "to": "plugin", "y": 280, "label": "回调 Plugin", "variant": "return" },
+    { "id": "m4", "from": "plugin", "to": "tmpl", "y": 340, "label": "渲染模板", "variant": "default" },
+    { "id": "m5", "from": "tmpl", "to": "plugin", "y": 400, "label": "生成代码", "variant": "return" },
+    { "id": "m6", "from": "plugin", "to": "protoc", "y": 460, "label": "stdout: 响应", "variant": "emphasis" }
+  ]
+}

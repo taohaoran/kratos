@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": { "title": "protoc-gen-plugins 架构图", "quality_profile": "standard", "locale": "zh-CN" },
+  "components": [
+    { "id": "protoc", "type": "external", "label": "protoc / buf", "pos": [40, 200], "size": [140, 60] },
+    { "id": "errors", "type": "backend", "label": "protoc-gen-go-errors\n错误码枚举生成", "pos": [300, 120], "size": [240, 70] },
+    { "id": "http", "type": "backend", "label": "protoc-gen-go-http\nHTTP 路由生成", "pos": [300, 280], "size": [240, 70] },
+    { "id": "tmpl", "type": "backend", "label": "text/template\n.tpl 模板", "pos": [600, 120], "size": [160, 60] },
+    { "id": "out", "type": "database", "label": "_errors.pb.go\n_http.pb.go", "pos": [600, 280], "size": [160, 60] },
+    { "id": "proto", "type": "external", "label": "errors.proto 扩展", "pos": [40, 360], "size": [220, 60] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "两个独立 go.mod 二进制", "wraps": ["errors", "http", "tmpl"] }
+  ],
+  "connections": [
+    { "id": "c1", "from": "protoc", "to": "errors", "label": "CodeGeneratorRequest", "variant": "emphasis" },
+    { "id": "c2", "from": "protoc", "to": "http", "label": "CodeGeneratorRequest", "variant": "emphasis" },
+    { "id": "c3", "from": "errors", "to": "tmpl", "label": "渲染", "variant": "default" },
+    { "id": "c4", "from": "tmpl", "to": "out", "variant": "default", "labelDy": 20 },
+    { "id": "c5", "from": "http", "to": "out", "label": "渲染", "variant": "default" },
+    { "id": "c6", "from": "proto", "to": "errors", "label": "读扩展", "variant": "dashed" }
+  ],
+  "cards": [
+    { "dot": "emerald", "title": "核心要点", "items": ["两个插件均基于 protogen 库，stdin/stdout 与 protoc 通信", "errors 把 enum 的 code 扩展渲染成构造函数", "http 把 google.api.HttpRule 渲染成路由注册"] }
+  ]
+}

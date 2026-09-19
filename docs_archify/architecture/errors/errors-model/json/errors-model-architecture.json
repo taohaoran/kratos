@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": { "title": "errors-model 架构图", "quality_profile": "standard", "locale": "zh-CN" },
+  "components": [
+    { "id": "app", "type": "frontend", "label": "业务代码", "pos": [40, 190], "size": [130, 60] },
+    { "id": "new", "type": "backend", "label": "New/BadRequest 等\n构造函数", "pos": [240, 190], "size": [180, 60] },
+    { "id": "err", "type": "backend", "label": "*Error\nStatus+cause", "pos": [480, 190], "size": [180, 70], "tag": "Code/Reason/Message" },
+    { "id": "grpc", "type": "external", "label": "gRPC status\n+ ErrorInfo", "pos": [820, 190], "size": [150, 60] },
+    { "id": "std", "type": "backend", "label": "Is/As/Unwrap\n(wrap.go)", "pos": [480, 360], "size": [180, 60] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "errors 包", "wraps": ["new", "err", "std"] }
+  ],
+  "connections": [
+    { "id": "c1", "from": "app", "to": "new", "label": "构造", "variant": "emphasis" },
+    { "id": "c2", "from": "new", "to": "err", "label": "返回 *Error", "variant": "default" },
+    { "id": "c3", "from": "err", "to": "grpc", "label": "GRPCStatus 双向", "variant": "default" },
+    { "id": "c5", "from": "err", "to": "std", "label": "Unwrap/Is 兼容", "variant": "default", "labelDy": 20 }
+  ],
+  "cards": [
+    { "dot": "emerald", "title": "核心要点", "items": ["业务错误 = HTTP code + reason 枚举 + message + metadata", "双向兼容 gRPC status 与标准 errors.Is/As", "FromError 支持从任意 error 链还原 *Error"] }
+  ]
+}

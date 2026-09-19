@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": { "title": "config-core 架构图", "quality_profile": "standard", "locale": "zh-CN" },
+  "components": [
+    { "id": "app", "type": "frontend", "label": "应用代码", "pos": [40, 180], "size": [140, 60] },
+    { "id": "config", "type": "backend", "label": "config 实现\nconfig.go", "pos": [290, 180], "size": [170, 60], "tag": "Config 接口" },
+    { "id": "reader", "type": "backend", "label": "reader\nreader.go", "pos": [290, 340], "size": [170, 60], "tag": "合并/解析" },
+    { "id": "value", "type": "backend", "label": "atomicValue\nvalue.go", "pos": [560, 180], "size": [170, 60], "tag": "类型转换" },
+    { "id": "opts", "type": "backend", "label": "策略函数组\noptions.go", "pos": [560, 340], "size": [170, 60], "tag": "可替换" },
+    { "id": "encoding", "type": "external", "label": "Codec 注册表\nencoding", "pos": [560, 500], "size": [170, 60] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "config 包内部", "wraps": ["config", "reader", "value", "opts"] }
+  ],
+  "connections": [
+    { "id": "c1", "from": "app", "to": "config", "label": "Load/Scan/Value", "variant": "emphasis" },
+    { "id": "c2", "from": "config", "to": "reader", "label": "Merge/Resolve", "variant": "default", "labelDy": 24 },
+    { "id": "c3", "from": "config", "to": "value", "label": "快照缓存", "variant": "default" },
+    { "id": "c4", "from": "reader", "to": "opts", "label": "调用策略", "variant": "default" },
+    { "id": "c5", "from": "reader", "to": "encoding", "label": "按 Format 取 Codec", "variant": "dashed" }
+  ],
+  "cards": [
+    { "dot": "emerald", "title": "核心要点", "items": ["多 Source 合并 + 占位符解析 + 原子值快照", "watch 协程逐 source 增量热更新并回调", "decoder/resolver/merge 均为可替换函数"] }
+  ]
+}

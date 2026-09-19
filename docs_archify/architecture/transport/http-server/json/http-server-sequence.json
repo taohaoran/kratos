@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": { "title": "HTTP 请求经 filter 到 handler 时序", "quality_profile": "showcase", "locale": "zh-CN", "viewBox": [1080, 720] },
+  "participants": [
+    { "id": "client", "type": "external", "label": "HTTP 客户端" },
+    { "id": "stdlib", "type": "external", "label": "net/http" },
+    { "id": "filter", "type": "backend", "label": "请求 filter" },
+    { "id": "mux", "type": "database", "label": "mux 路由" },
+    { "id": "biz", "type": "backend", "label": "业务 handler" }
+  ],
+  "messages": [
+    { "id": "m1", "from": "client", "to": "stdlib", "y": 160, "label": "HTTP 请求", "variant": "emphasis" },
+    { "id": "m2", "from": "stdlib", "to": "filter", "y": 210, "label": "进入 filter，注入超时并挂 Transporter", "variant": "default" },
+    { "id": "m3", "from": "filter", "to": "mux", "y": 280, "label": "next.ServeHTTP", "variant": "default" },
+    { "id": "m4", "from": "mux", "to": "biz", "y": 340, "label": "匹配路由调 h(ctx)", "variant": "default" },
+    { "id": "m5", "from": "biz", "to": "mux", "y": 400, "label": "返回 / 错误走 ene", "variant": "return" },
+    { "id": "m6", "from": "mux", "to": "filter", "y": 460, "label": "响应", "variant": "return" },
+    { "id": "m7", "from": "filter", "to": "stdlib", "y": 520, "label": "写响应", "variant": "return" },
+    { "id": "m8", "from": "stdlib", "to": "client", "y": 580, "label": "HTTP 响应", "variant": "return" }
+  ]
+}

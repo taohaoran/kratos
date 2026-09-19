@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": { "title": "Kratos App 启动与优雅停止时序", "quality_profile": "showcase", "locale": "zh-CN", "viewBox": [1180, 820] },
+  "participants": [
+    { "id": "main", "type": "external", "label": "main" },
+    { "id": "app", "type": "backend", "label": "App" },
+    { "id": "eg", "type": "backend", "label": "errgroup" },
+    { "id": "server", "type": "backend", "label": "Server" },
+    { "id": "reg", "type": "database", "label": "Registrar" },
+    { "id": "sig", "type": "external", "label": "OS 信号" }
+  ],
+  "messages": [
+    { "id": "m1", "from": "main", "to": "app", "y": 160, "label": "Run(ctx) 构建并启动", "variant": "emphasis" },
+    { "id": "m2", "from": "app", "to": "eg", "y": 230, "label": "并行 Start 各 Server", "variant": "default" },
+    { "id": "m3", "from": "eg", "to": "server", "y": 300, "label": "监听端口，暴露 Endpoint", "variant": "default" },
+    { "id": "m4", "from": "app", "to": "reg", "y": 375, "label": "Register（10s 超时）", "variant": "emphasis" },
+    { "id": "m5", "from": "app", "to": "sig", "y": 450, "label": "Notify 信号并阻塞等待", "variant": "dashed" },
+    { "id": "m6", "from": "sig", "to": "app", "y": 530, "label": "收到停止信号", "variant": "emphasis" },
+    { "id": "m7", "from": "app", "to": "reg", "y": 600, "label": "Deregister 摘除", "variant": "default" },
+    { "id": "m8", "from": "app", "to": "server", "y": 670, "label": "Stop 优雅停止", "variant": "return" },
+    { "id": "m9", "from": "app", "to": "main", "y": 735, "label": "Run 返回退出", "variant": "return" }
+  ]
+}

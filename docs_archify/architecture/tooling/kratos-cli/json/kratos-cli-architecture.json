@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": { "title": "kratos-cli 架构图", "quality_profile": "standard", "locale": "zh-CN" },
+  "components": [
+    { "id": "root", "type": "backend", "label": "rootCmd\ncobra 根命令", "pos": [40, 200], "size": [160, 60] },
+    { "id": "new", "type": "backend", "label": "project new/add\n模板脚手架", "pos": [290, 80], "size": [170, 60] },
+    { "id": "proto", "type": "backend", "label": "proto add/client/server", "pos": [290, 180], "size": [170, 60] },
+    { "id": "run", "type": "backend", "label": "run\ngo run 封装", "pos": [290, 280], "size": [170, 60] },
+    { "id": "change", "type": "backend", "label": "changelog\nGitHub API", "pos": [290, 380], "size": [170, 60] },
+    { "id": "upgrade", "type": "backend", "label": "upgrade\ngo install", "pos": [290, 480], "size": [170, 60] },
+    { "id": "base", "type": "backend", "label": "base 工具\nmod/repo/path", "pos": [560, 200], "size": [160, 60] },
+    { "id": "ext", "type": "external", "label": "外部依赖\ngit/go/GitHub", "pos": [560, 340], "size": [160, 60] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "cmd/kratos 独立模块", "wraps": ["root", "new", "proto", "run", "change", "upgrade", "base"] }
+  ],
+  "connections": [
+    { "id": "c1", "from": "root", "to": "new", "label": "AddCommand", "variant": "emphasis" },
+    { "id": "c2", "from": "root", "to": "proto", "variant": "default" },
+    { "id": "c3", "from": "root", "to": "run", "variant": "default" },
+    { "id": "c4", "from": "root", "to": "change", "variant": "default" },
+    { "id": "c5", "from": "root", "to": "upgrade", "variant": "default" },
+    { "id": "c6", "from": "new", "to": "base", "variant": "default" },
+    { "id": "c7", "from": "upgrade", "to": "base", "variant": "default" },
+    { "id": "c8", "from": "base", "to": "ext", "label": "exec 调用", "variant": "dashed", "labelDy": 20 }
+  ],
+  "cards": [
+    { "dot": "emerald", "title": "核心要点", "items": ["cobra 子命令树：new/proto/run/changelog/upgrade", "独立 go.mod，与主框架模块隔离", "通过 os/exec 调 git/go/GitHub API"] }
+  ]
+}

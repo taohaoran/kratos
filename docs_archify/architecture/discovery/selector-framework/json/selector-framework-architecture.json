@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": { "title": "selector 选择器框架组件图", "quality_profile": "showcase", "locale": "zh-CN" },
+  "components": [
+    { "id": "resolver", "type": "external", "label": "客户端 resolver", "pos": [40, 300], "size": [160, 60] },
+    { "id": "global", "type": "backend", "label": "GlobalSelector wrapSelector", "pos": [300, 120], "size": [190, 60] },
+    { "id": "def", "type": "backend", "label": "Default 组合选择器", "pos": [300, 300], "size": [180, 70], "tag": "selector 包" },
+    { "id": "bal", "type": "backend", "label": "Balancer.Pick", "pos": [620, 240], "size": [160, 60] },
+    { "id": "wnb", "type": "backend", "label": "WeightedNodeBuilder", "pos": [620, 380], "size": [170, 60] },
+    { "id": "filter", "type": "security", "label": "NodeFilter", "pos": [300, 480], "size": [140, 50] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "selector 包（框架层）", "wraps": ["global", "def", "bal", "wnb", "filter"] }
+  ],
+  "connections": [
+    { "id": "c1", "from": "resolver", "to": "global", "label": "GlobalSelector()", "variant": "default" },
+    { "id": "c2", "from": "resolver", "to": "def", "label": "调用", "variant": "emphasis" },
+    { "id": "c4", "from": "def", "to": "bal", "label": "Pick", "variant": "emphasis" },
+    { "id": "c5", "from": "def", "to": "wnb", "label": "Build", "variant": "default" }
+  ],
+  "cards": [
+    { "dot": "emerald", "title": "组合模式", "items": [
+      "Default = WeightedNodeBuilder + Balancer",
+      "nodes 用 atomic.Value 存储，Apply 整体替换",
+      "Select：NodeFilter 过滤 → Balancer.Pick → 返回 Node+Done"
+    ]}
+  ]
+}

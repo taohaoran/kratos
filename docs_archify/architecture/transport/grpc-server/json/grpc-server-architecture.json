@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": { "title": "gRPC 服务端结构与拦截器链图", "quality_profile": "showcase", "locale": "zh-CN", "viewBox": [1100, 720] },
+  "components": [
+    { "id": "app", "type": "frontend", "label": "App 生命周期", "pos": [60, 80], "size": [160, 60], "tag": "Start/Stop" },
+    { "id": "server", "type": "security", "label": "grpc.Server 包装", "pos": [400, 70], "size": [200, 90], "tag": "内嵌 *grpc.Server" },
+    { "id": "unary", "type": "backend", "label": "一元拦截器", "pos": [780, 40], "size": [180, 56], "tag": "挂载+超时+中间件" },
+    { "id": "stream", "type": "backend", "label": "流拦截器/wrappedStream", "pos": [780, 140], "size": [180, 60], "tag": "逐条消息中间件" },
+    { "id": "matcher", "type": "database", "label": "matcher 中间件匹配", "pos": [400, 330], "size": [200, 70], "tag": "按 operation 选择" },
+    { "id": "runtime", "type": "external", "label": "gRPC 运行时", "pos": [780, 330], "size": [180, 60], "tag": "不在本仓库" },
+    { "id": "attach", "type": "cloud", "label": "健康/reflection/admin", "pos": [60, 330], "size": [160, 60], "tag": "内置附属服务" }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "transport/grpc 服务端", "wraps": ["server", "unary", "stream"] }
+  ],
+  "connections": [
+    { "id": "c1", "from": "app", "to": "server", "label": "Start/Stop", "variant": "emphasis" },
+    { "id": "c2", "from": "server", "to": "unary", "label": "链化", "variant": "default" },
+    { "id": "c3", "from": "server", "to": "stream", "label": "链化", "variant": "default" },
+    { "id": "c4", "from": "unary", "to": "matcher", "label": "Match", "variant": "emphasis", "labelDy": 30 },
+    { "id": "c5", "from": "stream", "to": "matcher", "label": "Match", "variant": "default" },
+    { "id": "c6", "from": "server", "to": "runtime", "label": "Serve", "variant": "dashed" },
+    { "id": "c7", "from": "server", "to": "attach", "label": "注册", "variant": "dashed" }
+  ],
+  "cards": [
+    { "dot": "emerald", "title": "设计要点", "items": [
+      "一元与流式各有独立拦截器，中间件按 operation 选择器匹配",
+      "Stop 用 goroutine+done channel 优雅停止，超时强制 Stop",
+      "默认 1s 请求超时，TLS/反射/admin 可选项化"
+    ] }
+  ]
+}

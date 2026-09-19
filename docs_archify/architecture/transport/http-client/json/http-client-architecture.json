@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": { "title": "HTTP 客户端调用与选节点架构图", "quality_profile": "showcase", "locale": "zh-CN", "viewBox": [1120, 720] },
+  "components": [
+    { "id": "biz", "type": "frontend", "label": "生成 client stub", "pos": [40, 80], "size": [150, 60], "tag": "Invoke/Do" },
+    { "id": "client", "type": "security", "label": "http.Client", "pos": [320, 70], "size": [180, 80], "tag": "options+中间件" },
+    { "id": "resolver", "type": "database", "label": "resolver/watch", "pos": [640, 40], "size": [150, 56], "tag": "subset" },
+    { "id": "registry", "type": "external", "label": "registry.Discovery", "pos": [860, 40], "size": [150, 56], "tag": "在 contrib" },
+    { "id": "selector", "type": "cloud", "label": "selector 选节点", "pos": [640, 150], "size": [150, 64], "tag": "Select+done" },
+    { "id": "mw", "type": "backend", "label": "客户端中间件", "pos": [320, 330], "size": [180, 70], "tag": "Chain" },
+    { "id": "stdlib", "type": "external", "label": "net/http Client", "pos": [640, 330], "size": [150, 60], "tag": "不在本仓库" }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "transport/http 客户端", "wraps": ["client", "resolver", "selector"] }
+  ],
+  "connections": [
+    { "id": "c1", "from": "biz", "to": "client", "label": "调用", "variant": "emphasis" },
+    { "id": "c2", "from": "client", "to": "resolver", "label": "Watch", "variant": "default" },
+    { "id": "c3", "from": "client", "to": "selector", "label": "Select", "variant": "default" },
+    { "id": "c4", "from": "selector", "to": "mw", "label": "peer", "variant": "dashed", "labelDy": 28 },
+    { "id": "c5", "from": "resolver", "to": "registry", "label": "Watch", "variant": "dashed" },
+    { "id": "c6", "from": "selector", "to": "stdlib", "label": "发送", "variant": "dashed", "labelDy": 28 }
+  ],
+  "cards": [
+    { "dot": "emerald", "title": "设计要点", "items": [
+      "选节点失败返回 NODE_NOT_FOUND，空节点表拒绝写入",
+      "watch 出错退避 1s，block 模式同步等首次结果",
+      "非 2xx 经 errorDecoder 转为 *errors.Error"
+    ] }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": { "title": "config-sources 架构图", "quality_profile": "standard", "locale": "zh-CN" },
+  "components": [
+    { "id": "core", "type": "backend", "label": "config 核心\nconfig.go", "pos": [40, 200], "size": [160, 60], "tag": "Config 接口消费方" },
+    { "id": "iface", "type": "backend", "label": "Source/Watcher\n接口", "pos": [290, 200], "size": [150, 60] },
+    { "id": "env", "type": "backend", "label": "env source\nenv.go", "pos": [540, 120], "size": [160, 60], "tag": "环境变量" },
+    { "id": "envw", "type": "backend", "label": "env watcher\nwatcher.go", "pos": [540, 230], "size": [160, 60], "tag": "永不推送" },
+    { "id": "file", "type": "backend", "label": "file source\nfile.go", "pos": [540, 340], "size": [160, 60], "tag": "文件/目录" },
+    { "id": "filew", "type": "backend", "label": "file watcher\nwatcher.go", "pos": [540, 450], "size": [160, 60], "tag": "fsnotify 监听" },
+    { "id": "fs", "type": "external", "label": "文件系统\n/ fsnotify", "pos": [800, 340], "size": [150, 60] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "config/env 与 config/file", "wraps": ["env", "envw", "file", "filew"] }
+  ],
+  "connections": [
+    { "id": "c1", "from": "core", "to": "iface", "label": "Load/Watch", "variant": "emphasis" },
+    { "id": "c2", "from": "env", "to": "iface", "label": "实现 Source", "variant": "default" },
+    { "id": "c3", "from": "file", "to": "iface", "label": "实现 Source", "variant": "default" },
+    { "id": "c4", "from": "env", "to": "envw", "label": "Watch()", "variant": "default", "labelDy": 20 },
+    { "id": "c5", "from": "file", "to": "filew", "label": "Watch()", "variant": "default", "labelDy": 20 },
+    { "id": "c6", "from": "filew", "to": "fs", "label": "事件", "variant": "dashed" }
+  ],
+  "cards": [
+    { "dot": "emerald", "title": "核心要点", "items": ["env source 只做一次全量加载，watcher 永不推送", "file source 支持单文件/目录，watcher 用 fsnotify", "两者均实现 config.Source 接口契约"] }
+  ]
+}

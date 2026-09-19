@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": { "title": "config-core 热更新数据流", "quality_profile": "standard", "locale": "zh-CN" },
+  "stages": [ { "label": "Source 变更" }, { "label": "reader 处理" }, { "label": "差异比对" }, { "label": "通知" } ],
+  "nodes": [
+    { "id": "watcher", "type": "messagebus", "label": "Watcher.Next", "stage": 0, "row": 0 },
+    { "id": "merge", "type": "backend", "label": "Merge 合并", "stage": 1, "row": 0 },
+    { "id": "resolve", "type": "backend", "label": "Resolve 解析", "stage": 1, "row": 1 },
+    { "id": "diff", "type": "backend", "label": "差异比对", "stage": 2, "row": 0 },
+    { "id": "store", "type": "database", "label": "刷新快照", "stage": 2, "row": 1 },
+    { "id": "obs", "type": "external", "label": "Observer", "stage": 3, "row": 0 }
+  ],
+  "flows": [
+    { "from": "watcher", "to": "merge", "label": "增量", "variant": "emphasis", "route": "straight" },
+    { "from": "merge", "to": "resolve", "label": "合并后", "variant": "default", "route": "straight", "labelDy": 24 },
+    { "from": "resolve", "to": "diff", "label": "解析完", "variant": "default", "route": "straight" },
+    { "from": "diff", "to": "store", "label": "值变化", "variant": "emphasis", "route": "straight", "labelDy": 24 },
+    { "from": "store", "to": "obs", "label": "回调", "variant": "default", "route": "straight" }
+  ]
+}

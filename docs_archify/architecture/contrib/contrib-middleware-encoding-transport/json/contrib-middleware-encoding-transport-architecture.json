@@ -1,0 +1,176 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "contrib-middleware-encoding-transport 架构图",
+    "quality_profile": "standard",
+    "locale": "zh-CN"
+  },
+  "components": [
+    {
+      "id": "core",
+      "type": "backend",
+      "label": "kratos 核心\nmiddleware/encoding/transport",
+      "pos": [
+        40,
+        200
+      ],
+      "size": [
+        280,
+        70
+      ]
+    },
+    {
+      "id": "jwt",
+      "type": "external",
+      "label": "middleware/jwt",
+      "pos": [
+        360,
+        80
+      ],
+      "size": [
+        150,
+        50
+      ]
+    },
+    {
+      "id": "validate",
+      "type": "external",
+      "label": "middleware/validate",
+      "pos": [
+        360,
+        150
+      ],
+      "size": [
+        150,
+        50
+      ]
+    },
+    {
+      "id": "msgpack",
+      "type": "external",
+      "label": "encoding/msgpack",
+      "pos": [
+        360,
+        230
+      ],
+      "size": [
+        150,
+        50
+      ]
+    },
+    {
+      "id": "mcp",
+      "type": "external",
+      "label": "transport/mcp",
+      "pos": [
+        360,
+        310
+      ],
+      "size": [
+        150,
+        50
+      ]
+    },
+    {
+      "id": "polaris",
+      "type": "external",
+      "label": "contrib/polaris",
+      "pos": [
+        360,
+        390
+      ],
+      "size": [
+        150,
+        50
+      ]
+    },
+    {
+      "id": "ext",
+      "type": "external",
+      "label": "外部库\njwt5/msgpack/mcp-go",
+      "pos": [
+        640,
+        230
+      ],
+      "size": [
+        200,
+        70
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "contrib 扩展",
+      "wraps": [
+        "jwt",
+        "validate",
+        "msgpack",
+        "mcp",
+        "polaris"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "c1",
+      "from": "jwt",
+      "to": "core",
+      "variant": "default"
+    },
+    {
+      "id": "c2",
+      "from": "validate",
+      "to": "core",
+      "variant": "default"
+    },
+    {
+      "id": "c3",
+      "from": "msgpack",
+      "to": "core",
+      "variant": "default"
+    },
+    {
+      "id": "c4",
+      "from": "mcp",
+      "to": "core",
+      "variant": "default"
+    },
+    {
+      "id": "c5",
+      "from": "polaris",
+      "to": "core",
+      "variant": "default"
+    },
+    {
+      "id": "c6",
+      "from": "jwt",
+      "to": "ext",
+      "variant": "dashed"
+    },
+    {
+      "id": "c7",
+      "from": "msgpack",
+      "to": "ext",
+      "variant": "dashed"
+    },
+    {
+      "id": "c8",
+      "from": "mcp",
+      "to": "ext",
+      "variant": "dashed"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "核心要点",
+      "items": [
+        "JWT/validate 实现 middleware.Middleware",
+        "msgpack 走 encoding init 自注册",
+        "mcp 实现 transport.Server/Endpointer"
+      ]
+    }
+  ]
+}

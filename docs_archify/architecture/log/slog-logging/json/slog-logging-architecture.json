@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": { "title": "slog-logging 架构图", "quality_profile": "standard", "locale": "zh-CN" },
+  "components": [
+    { "id": "helper", "type": "frontend", "label": "包级函数\nlog.Info/Debug", "pos": [40, 200], "size": [160, 60] },
+    { "id": "ctx", "type": "backend", "label": "contextHandler\nextractors", "pos": [280, 200], "size": [170, 60], "tag": "注入 ctx 属性" },
+    { "id": "filter", "type": "backend", "label": "filterHandler\n脱敏/丢弃", "pos": [520, 200], "size": [170, 60], "tag": "FilterKey/FilterFunc" },
+    { "id": "base", "type": "backend", "label": "baseHandler\ntext/json", "pos": [760, 200], "size": [160, 60], "tag": "slog.Handler" },
+    { "id": "out", "type": "external", "label": "io.Writer\n默认 stderr", "pos": [760, 340], "size": [160, 60] },
+    { "id": "ctxapi", "type": "backend", "label": "ContextWithAttrs\n(context.go)", "pos": [280, 340], "size": [190, 60] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "log 包装饰器链", "wraps": ["ctx", "filter", "base"] }
+  ],
+  "connections": [
+    { "id": "c1", "from": "helper", "to": "ctx", "label": "Log 记录", "variant": "emphasis" },
+    { "id": "c2", "from": "ctx", "to": "filter", "label": "Handle", "variant": "default" },
+    { "id": "c3", "from": "filter", "to": "base", "label": "Handle", "variant": "default" },
+    { "id": "c4", "from": "base", "to": "out", "label": "写入", "variant": "default", "labelDy": 20 }
+  ],
+  "cards": [
+    { "dot": "emerald", "title": "核心要点", "items": ["完全基于标准库 log/slog，kratos 只加装饰器", "contextHandler 从 ctx 抽 attrs，filterHandler 脱敏", "NewHandler 默认 stderr+text+Info 级"] }
+  ]
+}

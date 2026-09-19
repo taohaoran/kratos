@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": { "title": "中间件链组装与匹配图", "quality_profile": "showcase", "locale": "zh-CN", "viewBox": [1100, 680] },
+  "components": [
+    { "id": "transport", "type": "frontend", "label": "gRPC/HTTP server", "pos": [60, 80], "size": [170, 60], "tag": "持有 Matcher" },
+    { "id": "matcher", "type": "security", "label": "matcher.Matcher", "pos": [380, 70], "size": [180, 80], "tag": "Use/Add/Match" },
+    { "id": "chain", "type": "backend", "label": "middleware.Chain", "pos": [720, 70], "size": [170, 80], "tag": "反向包裹" },
+    { "id": "mw1", "type": "cloud", "label": "内置中间件", "pos": [380, 330], "size": [180, 70], "tag": "recovery/logging..." },
+    { "id": "handler", "type": "backend", "label": "业务 Handler", "pos": [720, 330], "size": [170, 70], "tag": "func(ctx,req)" }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "middleware 域", "wraps": ["matcher", "chain", "mw1"] }
+  ],
+  "connections": [
+    { "id": "c1", "from": "transport", "to": "matcher", "label": "Match(operation)", "variant": "emphasis" },
+    { "id": "c2", "from": "matcher", "to": "chain", "label": "选中中间件", "variant": "default" },
+    { "id": "c3", "from": "chain", "to": "mw1", "label": "包裹", "variant": "default" },
+    { "id": "c4", "from": "chain", "to": "handler", "label": "执行", "variant": "emphasis", "labelDy": 28 },
+    { "id": "c5", "from": "mw1", "to": "handler", "label": "next", "variant": "dashed" }
+  ],
+  "cards": [
+    { "dot": "emerald", "title": "设计要点", "items": [
+      "Chain 从后向前包裹，执行顺序与声明一致",
+      "Match：defaults 前置 → 精确 → 最长前缀",
+      "selector 支持 /*、/pkg.Svc/*、/pkg.Svc/Method 三级"
+    ] }
+  ]
+}

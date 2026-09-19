@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": { "title": "韧性中间件结构图", "quality_profile": "showcase", "locale": "zh-CN", "viewBox": [1100, 680] },
+  "components": [
+    { "id": "handler", "type": "frontend", "label": "业务 handler", "pos": [60, 80], "size": [160, 60], "tag": "被包裹" },
+    { "id": "recovery", "type": "security", "label": "Recovery", "pos": [380, 40], "size": [170, 56], "tag": "recover panic" },
+    { "id": "ratelimit", "type": "backend", "label": "ratelimit.Server", "pos": [380, 140], "size": [170, 64], "tag": "bbr 限流" },
+    { "id": "breaker", "type": "database", "label": "circuitbreaker.Client", "pos": [380, 250], "size": [170, 64], "tag": "SRE 熔断" },
+    { "id": "internal", "type": "cloud", "label": "internal 算法", "pos": [740, 140], "size": [180, 80], "tag": "bbr/SRE/group" },
+    { "id": "errors", "type": "messagebus", "label": "errors 包", "pos": [740, 280], "size": [180, 60], "tag": "错误码判定" }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "middleware 韧性", "wraps": ["recovery", "ratelimit", "breaker"] }
+  ],
+  "connections": [
+    { "id": "c1", "from": "handler", "to": "recovery", "label": "包裹", "variant": "emphasis" },
+    { "id": "c2", "from": "recovery", "to": "ratelimit", "label": "next", "variant": "default", "labelDy": 26 },
+    { "id": "c3", "from": "ratelimit", "to": "breaker", "label": "next", "variant": "default", "labelDy": 26 },
+    { "id": "c4", "from": "ratelimit", "to": "internal", "label": "Allow/done", "variant": "default" },
+    { "id": "c5", "from": "breaker", "to": "internal", "label": "Allow/Mark", "variant": "default" },
+    { "id": "c6", "from": "breaker", "to": "errors", "label": "错误码", "variant": "dashed" }
+  ],
+  "cards": [
+    { "dot": "emerald", "title": "设计要点", "items": [
+      "Recovery 用 recover+runtime.Stack 把 panic 转错误",
+      "ratelimit 默认 bbr，拒绝返回 429",
+      "circuitbreaker 按 operation 懒建 breaker，本地拒绝仍 MarkFailed"
+    ] }
+  ]
+}

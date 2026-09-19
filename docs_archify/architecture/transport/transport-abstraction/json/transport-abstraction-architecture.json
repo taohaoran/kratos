@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": { "title": "传输层抽象与 context 挂载架构图", "quality_profile": "showcase", "locale": "zh-CN", "viewBox": [1100, 720] },
+  "components": [
+    { "id": "app", "type": "frontend", "label": "App 生命周期", "pos": [60, 80], "size": [160, 64], "tag": "Start/Stop" },
+    { "id": "abstraction", "type": "security", "label": "transport 抽象接口", "pos": [420, 70], "size": [200, 90], "tag": "契约层" },
+    { "id": "grpcimpl", "type": "backend", "label": "gRPC 实现", "pos": [820, 40], "size": [170, 56], "tag": "metadata.MD" },
+    { "id": "httpimpl", "type": "backend", "label": "HTTP 实现", "pos": [820, 150], "size": [170, 56], "tag": "http.Header" },
+    { "id": "ctx", "type": "database", "label": "context 挂载", "pos": [420, 330], "size": [200, 70], "tag": "Server/Client" },
+    { "id": "mw", "type": "cloud", "label": "中间件消费方", "pos": [820, 330], "size": [170, 70], "tag": "logging/metadata" },
+    { "id": "registry", "type": "external", "label": "注册发现", "pos": [60, 330], "size": [160, 64], "tag": "Endpointer" }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "transport 域契约层", "wraps": ["abstraction", "ctx"] }
+  ],
+  "connections": [
+    { "id": "c1", "from": "app", "to": "abstraction", "label": "持有", "variant": "emphasis" },
+    { "id": "c2", "from": "grpcimpl", "to": "abstraction", "label": "实现", "variant": "default" },
+    { "id": "c3", "from": "httpimpl", "to": "abstraction", "label": "实现", "variant": "default" },
+    { "id": "c4", "from": "abstraction", "to": "ctx", "label": "写入", "variant": "emphasis", "labelDy": 36 },
+    { "id": "c5", "from": "mw", "to": "ctx", "label": "读取", "variant": "default" },
+    { "id": "c6", "from": "registry", "to": "abstraction", "label": "调用", "variant": "dashed" }
+  ],
+  "cards": [
+    { "dot": "emerald", "title": "设计要点", "items": [
+      "接口定义在抽象包，grpc/http 实现、middleware 消费均依赖抽象",
+      "Header 接口屏蔽 http.Header 与 metadata.MD 差异",
+      "context key 用未导出空结构体，无锁并发安全"
+    ] }
+  ]
+}

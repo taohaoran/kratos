@@ -1,0 +1,180 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "contrib-config 架构图",
+    "quality_profile": "standard",
+    "locale": "zh-CN"
+  },
+  "components": [
+    {
+      "id": "iface",
+      "type": "backend",
+      "label": "Source/Watcher\nconfig 接口",
+      "pos": [
+        40,
+        200
+      ],
+      "size": [
+        180,
+        70
+      ],
+      "tag": "核心接口"
+    },
+    {
+      "id": "apollo",
+      "type": "external",
+      "label": "apollo",
+      "pos": [
+        320,
+        60
+      ],
+      "size": [
+        140,
+        50
+      ]
+    },
+    {
+      "id": "consul",
+      "type": "external",
+      "label": "consul",
+      "pos": [
+        320,
+        130
+      ],
+      "size": [
+        140,
+        50
+      ]
+    },
+    {
+      "id": "etcd",
+      "type": "external",
+      "label": "etcd",
+      "pos": [
+        320,
+        200
+      ],
+      "size": [
+        140,
+        50
+      ]
+    },
+    {
+      "id": "k8s",
+      "type": "external",
+      "label": "kubernetes",
+      "pos": [
+        320,
+        270
+      ],
+      "size": [
+        140,
+        50
+      ]
+    },
+    {
+      "id": "nacos",
+      "type": "external",
+      "label": "nacos",
+      "pos": [
+        320,
+        340
+      ],
+      "size": [
+        140,
+        50
+      ]
+    },
+    {
+      "id": "polaris",
+      "type": "external",
+      "label": "polaris",
+      "pos": [
+        320,
+        410
+      ],
+      "size": [
+        140,
+        50
+      ]
+    },
+    {
+      "id": "core",
+      "type": "frontend",
+      "label": "config 核心\nWithSource",
+      "pos": [
+        600,
+        200
+      ],
+      "size": [
+        160,
+        60
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "contrib/config/* 各适配包",
+      "wraps": [
+        "apollo",
+        "consul",
+        "etcd",
+        "k8s",
+        "nacos",
+        "polaris"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "c1",
+      "from": "apollo",
+      "to": "iface",
+      "label": "实现 Source",
+      "variant": "default"
+    },
+    {
+      "id": "c2",
+      "from": "consul",
+      "to": "iface",
+      "variant": "default"
+    },
+    {
+      "id": "c3",
+      "from": "etcd",
+      "to": "iface",
+      "variant": "default"
+    },
+    {
+      "id": "c4",
+      "from": "k8s",
+      "to": "iface",
+      "variant": "default"
+    },
+    {
+      "id": "c5",
+      "from": "nacos",
+      "to": "iface",
+      "variant": "default"
+    },
+    {
+      "id": "c6",
+      "from": "polaris",
+      "to": "iface",
+      "variant": "default"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "核心要点",
+      "items": [
+        "6 个配置中心均实现 config.Source/Watcher",
+        "New(...) 返回 (config.Source, error)",
+        "watcher 把后端变更转成 []*KeyValue 推送"
+      ]
+    }
+  ]
+}

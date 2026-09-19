@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": { "title": "可观测性中间件结构图", "quality_profile": "showcase", "locale": "zh-CN", "viewBox": [1100, 680] },
+  "components": [
+    { "id": "handler", "type": "frontend", "label": "业务 handler", "pos": [60, 80], "size": [160, 60], "tag": "被包裹" },
+    { "id": "logging", "type": "security", "label": "logging", "pos": [380, 40], "size": [160, 56], "tag": "slog 记录" },
+    { "id": "metadata", "type": "backend", "label": "metadata", "pos": [380, 140], "size": [160, 64], "tag": "头透传" },
+    { "id": "selector", "type": "database", "label": "selector", "pos": [380, 250], "size": [160, 64], "tag": "条件选中间件" },
+    { "id": "validate", "type": "cloud", "label": "validate", "pos": [380, 360], "size": [160, 64], "tag": "请求校验" },
+    { "id": "transport", "type": "external", "label": "transport ctx", "pos": [740, 140], "size": [170, 60], "tag": "FromServer/ClientContext" },
+    { "id": "md", "type": "messagebus", "label": "metadata 包", "pos": [740, 250], "size": [170, 60], "tag": "键值透传" }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "middleware 可观测性", "wraps": ["logging", "metadata", "selector", "validate"] }
+  ],
+  "connections": [
+    { "id": "c1", "from": "handler", "to": "logging", "label": "包裹", "variant": "emphasis" },
+    { "id": "c2", "from": "logging", "to": "metadata", "label": "next", "variant": "default", "labelDy": 26 },
+    { "id": "c3", "from": "metadata", "to": "selector", "label": "next", "variant": "default", "labelDy": 26 },
+    { "id": "c4", "from": "selector", "to": "validate", "label": "next", "variant": "default", "labelDy": 26 },
+    { "id": "c5", "from": "logging", "to": "transport", "label": "读", "variant": "dashed" },
+    { "id": "c6", "from": "metadata", "to": "md", "label": "透传", "variant": "dashed" }
+  ],
+  "cards": [
+    { "dot": "emerald", "title": "设计要点", "items": [
+      "logging 用 Redact/Stringer 提取参数，err 决定级别与栈",
+      "metadata server 收头、client 发头，按 x-md- 前缀过滤",
+      "selector 按 prefix/regex/path 决定是否套子链"
+    ] }
+  ]
+}

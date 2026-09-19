@@ -1,0 +1,66 @@
+# GitHub Pages 部署 workflow（GitHub Actions 发布源）
+# 内容源优先级:
+#   1) 存在 docs-archify / docs_archify（前者优先）→ 站点内容严格等于该源目录内容，不混入 docs/；
+#   2) 不存在任何 archify 源 → 回退部署 docs/。
+#   archify 源必须提交进仓库；其变更（push）同样触发部署。
+# 导览与渲染强制: 选源后固定运行 scripts/build-docs-html.py site —— md 转 html + 生成三级中文导览 index.html。
+name: Deploy Kratos Docs to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - 'docs-archify/**'
+      - 'docs_archify/**'
+      - 'scripts/build-docs-html.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      # ---- 内容源选择：archify 源存在则严格按它部署，否则回退 docs ----
+      - name: Build site content (archify source priority)
+        run: |
+          set -euo pipefail
+          rm -rf site && mkdir -p site
+          if [ -d "docs-archify" ] || [ -d "docs_archify" ]; then
+            SRC=""
+            if [ -d "docs-archify" ]; then SRC="docs-archify"; else SRC="docs_archify"; fi
+            echo "==> $SRC found -> deploying its content strictly"
+            cp -R "$SRC/." site/
+          else
+            echo "==> no archify source dir found -> deploying docs"
+            cp -R docs/. site/
+          fi
+          # ---- md 默认转 html + 强制生成导览 index.md 并渲染为 index.html ----
+          pip install --quiet markdown
+          python3 scripts/build-docs-html.py site --site-name "Kratos 架构文档" --group-label "architecture=架构" --label-map "app-runtime=应用运行时|config=配置|contrib=扩展组件|discovery=服务发现|encoding=编解码|errors=错误|log=日志|metadata=元数据|middleware=中间件|tooling=工具链|transport=传输层|_exploration=探索记录|resilience-internal=韧性内部实现|facts=探索记录|http-server=HTTP 服务端|grpc-server=gRPC 服务端|http-client=HTTP 客户端|grpc-client=gRPC 客户端|transport-abstraction=传输抽象|http-binding-codec=HTTP 绑定编解码|builtin-resilience-middleware=内置韧性中间件|builtin-observability-middleware=内置可观测中间件|middleware-stack=中间件栈|kratos-cli=Kratos CLI|protoc-gen-plugins=Protoc 插件|config-sources=配置源|config-core=配置核心|selector-framework=选择器框架|registry-interface=注册中心接口|selector-algorithms=选择算法|encoding-framework=编解码框架|app-lifecycle=应用生命周期|contrib-registry=扩展组件注册|contrib-config=扩展配置|contrib-middleware-encoding-transport=中间件/编解码/传输扩展|contrib-observability=可观测性扩展|errors-model=错误模型|slog-logging=Slog 日志|metadata-propagation=元数据传递|bbr-ratelimit=BBR 限流|endpoint-group-host=端点分组主机|sre-circuitbreaker=SRE 熔断器|subset-matcher-httputil=子集匹配 HTTP 工具"
+          touch site/.nojekyll
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

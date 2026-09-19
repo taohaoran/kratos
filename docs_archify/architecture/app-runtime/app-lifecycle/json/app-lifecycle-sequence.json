@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": { "title": "App 启动→注册→信号→优雅停止时序", "quality_profile": "showcase", "locale": "zh-CN", "viewBox": [1240, 1040], "column_fit": "spread" },
+  "participants": [
+    { "id": "main", "type": "external", "label": "main 协程" },
+    { "id": "app", "type": "backend", "label": "App.Run" },
+    { "id": "hooks", "type": "backend", "label": "生命周期钩子" },
+    { "id": "srv", "type": "backend", "label": "Server(goroutine)" },
+    { "id": "reg", "type": "external", "label": "Registrar" },
+    { "id": "os", "type": "external", "label": "操作系统" }
+  ],
+  "messages": [
+    { "id": "m1", "from": "main", "to": "app", "y": 160, "label": "Run()", "variant": "emphasis" },
+    { "id": "m2", "from": "app", "to": "hooks", "y": 220, "label": "beforeStart 钩子" },
+    { "id": "m3", "from": "app", "to": "srv", "y": 280, "label": "server.Start(octx) (eg.Go, wg.Wait 后注册)", "variant": "emphasis" },
+    { "id": "m4", "from": "app", "to": "reg", "y": 340, "label": "Register(ctx, instance) 10s 超时", "variant": "emphasis" },
+    { "id": "m5", "from": "app", "to": "hooks", "y": 400, "label": "afterStart 钩子" },
+    { "id": "m6", "from": "os", "to": "app", "y": 470, "label": "SIGTERM (signal channel)", "variant": "dashed" },
+    { "id": "m7", "from": "app", "to": "hooks", "y": 540, "label": "Stop(): beforeStop 钩子", "variant": "emphasis" },
+    { "id": "m8", "from": "app", "to": "reg", "y": 600, "label": "Deregister(ctx, instance) 10s 超时", "variant": "emphasis" },
+    { "id": "m9", "from": "app", "to": "srv", "y": 660, "label": "server.Stop(WithoutCancel+stopTimeout)", "variant": "emphasis" },
+    { "id": "m10", "from": "app", "to": "hooks", "y": 730, "label": "afterStop 钩子" },
+    { "id": "m11", "from": "app", "to": "main", "y": 800, "label": "返回 error", "variant": "return" }
+  ]
+}

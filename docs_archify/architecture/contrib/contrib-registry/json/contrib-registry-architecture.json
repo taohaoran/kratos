@@ -1,0 +1,154 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "contrib-registry 架构图",
+    "quality_profile": "standard",
+    "locale": "zh-CN"
+  },
+  "components": [
+    {
+      "id": "iface",
+      "type": "backend",
+      "label": "Registrar/Discovery\nregistry.go",
+      "pos": [
+        40,
+        200
+      ],
+      "size": [
+        220,
+        70
+      ],
+      "tag": "核心接口"
+    },
+    {
+      "id": "etcd",
+      "type": "external",
+      "label": "etcd 实现",
+      "pos": [
+        320,
+        60
+      ],
+      "size": [
+        150,
+        50
+      ]
+    },
+    {
+      "id": "consul",
+      "type": "external",
+      "label": "consul 实现",
+      "pos": [
+        320,
+        130
+      ],
+      "size": [
+        150,
+        50
+      ]
+    },
+    {
+      "id": "k8s",
+      "type": "external",
+      "label": "kubernetes 实现",
+      "pos": [
+        320,
+        200
+      ],
+      "size": [
+        150,
+        50
+      ]
+    },
+    {
+      "id": "nacos",
+      "type": "external",
+      "label": "nacos 实现",
+      "pos": [
+        320,
+        270
+      ],
+      "size": [
+        150,
+        50
+      ]
+    },
+    {
+      "id": "others",
+      "type": "external",
+      "label": "eureka/zookeeper\nservicecomb/polaris",
+      "pos": [
+        320,
+        360
+      ],
+      "size": [
+        260,
+        60
+      ]
+    },
+    {
+      "id": "app",
+      "type": "frontend",
+      "label": "应用\nNew(reg)",
+      "pos": [
+        620,
+        200
+      ],
+      "size": [
+        150,
+        60
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "c1",
+      "from": "etcd",
+      "to": "iface",
+      "label": "实现接口",
+      "variant": "default"
+    },
+    {
+      "id": "c2",
+      "from": "consul",
+      "to": "iface",
+      "variant": "default"
+    },
+    {
+      "id": "c3",
+      "from": "k8s",
+      "to": "iface",
+      "variant": "default"
+    },
+    {
+      "id": "c4",
+      "from": "nacos",
+      "to": "iface",
+      "variant": "default"
+    },
+    {
+      "id": "c5",
+      "from": "others",
+      "to": "iface",
+      "variant": "default"
+    },
+    {
+      "id": "c6",
+      "from": "iface",
+      "to": "app",
+      "label": "注入 App",
+      "variant": "emphasis"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "核心要点",
+      "items": [
+        "9 个注册中心均实现 Registrar/Discovery/Watcher",
+        "编译期断言 var _ registry.Registrar = (*X)(nil)",
+        "各实现独立 go.mod，按需引入"
+      ]
+    }
+  ]
+}

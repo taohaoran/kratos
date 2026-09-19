@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": { "title": "endpoint/group/host 工具组件图", "quality_profile": "showcase", "locale": "zh-CN" },
+  "components": [
+    { "id": "t", "type": "external", "label": "transport http/grpc server", "pos": [40, 300], "size": [200, 60] },
+    { "id": "ep", "type": "backend", "label": "endpoint", "pos": [330, 160], "size": [150, 60], "tag": "URL 解析" },
+    { "id": "gp", "type": "backend", "label": "group 懒加载容器", "pos": [330, 300], "size": [170, 60] },
+    { "id": "ho", "type": "backend", "label": "host 主机端口", "pos": [330, 440], "size": [150, 60], "tag": "网卡提取" }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "internal/{endpoint,group,host}", "wraps": ["ep", "gp", "ho"] }
+  ],
+  "connections": [
+    { "id": "c1", "from": "t", "to": "ep", "label": "ParseEndpoint", "variant": "default" },
+    { "id": "c2", "from": "t", "to": "gp", "label": "Get/Reset", "variant": "default" },
+    { "id": "c3", "from": "t", "to": "ho", "label": "Extract", "variant": "emphasis" }
+  ],
+  "cards": [
+    { "dot": "emerald", "title": "三件套职责", "items": [
+      "endpoint：按 scheme 从多 endpoint 串选 host、拼安全 scheme",
+      "group：泛型懒加载容器，双重检查锁单例缓存",
+      "host：从监听器/网卡提取可对外通告的私有 IP:Port"
+    ]}
+  ]
+}

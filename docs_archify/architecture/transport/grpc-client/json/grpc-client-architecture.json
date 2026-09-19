@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": { "title": "gRPC 客户端构造与选节点架构图", "quality_profile": "showcase", "locale": "zh-CN", "viewBox": [1100, 720] },
+  "components": [
+    { "id": "user", "type": "frontend", "label": "生成 client stub", "pos": [60, 80], "size": [160, 60], "tag": "业务调用" },
+    { "id": "newclient", "type": "security", "label": "NewClient 组装", "pos": [380, 70], "size": [190, 80], "tag": "options+拦截器" },
+    { "id": "resolver", "type": "database", "label": "resolver", "pos": [760, 40], "size": [180, 56], "tag": "direct/discovery" },
+    { "id": "balancer", "type": "backend", "label": "selector balancer/Pick", "pos": [760, 150], "size": [180, 64], "tag": "选节点" },
+    { "id": "selector", "type": "cloud", "label": "kratos selector", "pos": [380, 330], "size": [190, 70], "tag": "WRR/P2C" },
+    { "id": "registry", "type": "external", "label": "registry.Discovery", "pos": [60, 330], "size": [160, 64], "tag": "在 contrib" },
+    { "id": "runtime", "type": "external", "label": "gRPC 运行时", "pos": [760, 330], "size": [180, 60], "tag": "不在本仓库" }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "transport/grpc 客户端", "wraps": ["newclient", "resolver", "balancer"] }
+  ],
+  "connections": [
+    { "id": "c1", "from": "user", "to": "newclient", "label": "构造", "variant": "emphasis" },
+    { "id": "c2", "from": "newclient", "to": "resolver", "label": "WithResolvers", "variant": "default" },
+    { "id": "c3", "from": "newclient", "to": "balancer", "label": "服务配置", "variant": "default" },
+    { "id": "c4", "from": "balancer", "to": "selector", "label": "Select", "variant": "emphasis", "labelDy": 28 },
+    { "id": "c5", "from": "newclient", "to": "registry", "label": "WithDiscovery", "variant": "dashed" },
+    { "id": "c6", "from": "balancer", "to": "runtime", "label": "返回 SubConn", "variant": "dashed", "labelDy": 30 }
+  ],
+  "cards": [
+    { "dot": "emerald", "title": "设计要点", "items": [
+      "balancer 名为 selector，桥接 kratos selector 算法",
+      "discovery watch 出错退避 1s 重试，仅 ctx 取消退出",
+      "NodeFilter 经 Transport 从调用上下文传入 Pick"
+    ] }
+  ]
+}

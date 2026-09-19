@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": { "title": "负载均衡算法与节点权重实现图", "quality_profile": "showcase", "locale": "zh-CN" },
+  "components": [
+    { "id": "def", "type": "external", "label": "Default 选择器", "pos": [40, 300], "size": [150, 60] },
+    { "id": "p2c", "type": "backend", "label": "p2c + ewma", "pos": [330, 130], "size": [150, 60], "tag": "延迟感知" },
+    { "id": "wrr", "type": "backend", "label": "wrr + direct", "pos": [330, 300], "size": [150, 60], "tag": "加权轮询" },
+    { "id": "rnd", "type": "backend", "label": "random + direct", "pos": [330, 470], "size": [150, 60], "tag": "随机" },
+    { "id": "vf", "type": "security", "label": "filter.Version", "pos": [640, 300], "size": [150, 60] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "selector/{p2c,wrr,random,node,filter}", "wraps": ["p2c", "wrr", "rnd", "vf"] }
+  ],
+  "connections": [
+    { "id": "c1", "from": "def", "to": "p2c", "label": "Build", "variant": "default" },
+    { "id": "c2", "from": "def", "to": "wrr", "label": "Build", "variant": "emphasis" },
+    { "id": "c3", "from": "def", "to": "rnd", "label": "Build", "variant": "default" }
+  ],
+  "cards": [
+    { "dot": "emerald", "title": "算法组合", "items": [
+      "p2c：两随机选优 + ewma 延迟/成功率加权，forcePick 3s 探活",
+      "wrr：nginx 平滑加权轮询 + direct 静态权重",
+      "random：均匀随机 + direct；filter.Version 按版本过滤节点"
+    ]}
+  ]
+}

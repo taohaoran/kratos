@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": { "title": "BBR 自适应限流器组件图", "quality_profile": "showcase", "locale": "zh-CN" },
+  "components": [
+    { "id": "mw", "type": "external", "label": "ratelimit middleware (Server)", "pos": [40, 300], "size": [200, 60] },
+    { "id": "bbr", "type": "backend", "label": "BBR Limiter", "pos": [330, 290], "size": [150, 80], "tag": "internal/ratelimit" },
+    { "id": "cpu", "type": "backend", "label": "gCPU 平滑值", "pos": [620, 120], "size": [150, 60] },
+    { "id": "pass", "type": "database", "label": "passStat 通过计数窗口", "pos": [620, 260], "size": [170, 60] },
+    { "id": "rt", "type": "database", "label": "rtStat 时延窗口", "pos": [620, 400], "size": [170, 60] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "internal/ratelimit（仅框架内部）", "wraps": ["bbr", "cpu", "pass", "rt"] }
+  ],
+  "connections": [
+    { "id": "c1", "from": "mw", "to": "bbr", "label": "Allow()", "variant": "emphasis" },
+    { "id": "c2", "from": "cpu", "to": "bbr", "label": "cpu() 读取", "variant": "dashed" },
+    { "id": "c3", "from": "bbr", "to": "pass", "label": "maxPASS()", "variant": "default" },
+    { "id": "c4", "from": "bbr", "to": "rt", "label": "minRT()", "variant": "default" },
+    { "id": "c5", "from": "bbr", "to": "mw", "label": "DoneFunc 回调", "variant": "default" }
+  ],
+  "cards": [
+    { "dot": "emerald", "title": "自适应公式", "items": [
+      "maxInFlight = maxPASS × minRT × bucketPerSecond / 1000",
+      "CPU 阈值默认 800（千分制），窗口 10s/100 桶",
+      "CPU 高且 inFlight>maxInFlight 才主动限流，低 CPU 时仅短时延续"
+    ]}
+  ]
+}
